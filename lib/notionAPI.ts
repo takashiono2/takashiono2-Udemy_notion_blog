@@ -6,7 +6,7 @@ const notion = new Client({
 
 export const getAllPosts = async () => {
   const posts = await notion.databases.query({
-    database_id: process.env.NOTION_DATABASE_ID,
+    database_id: process.env.NOTION_DATABASE_ID as string,
     page_size: 100,
   });
   const allPosts = posts.results;
@@ -31,5 +31,25 @@ const getPageMetaData = (post) => {
     date: post.properties.Date.date.start,
     slug: post.properties.Slug.rich_text[0].plain_text,
     tags: getTags(post.properties.Tags.multi_select)
+  };
+};
+
+export const getSinglePost = async(slug) => {
+  const response = await notion.databases.query({
+    database_id: process.env.NOTION_DATABASE_ID as string,
+    filter: {
+      property: "Slug",
+      formula: {
+        string:{
+          equals: slug,
+        }
+      },
+    },
+  });
+
+  const page = response.results[0];
+  console.log(page);
+  return {
+    page,
   };
 };
