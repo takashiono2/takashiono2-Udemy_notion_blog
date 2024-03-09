@@ -1,5 +1,9 @@
 import { getAllPosts, getSinglePost } from '@/lib/notionAPI';
+import Link from 'next/link';
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
 export const getStaticPaths = async () => {
   const allPosts = await getAllPosts();
@@ -38,9 +42,36 @@ const Post = ({ post }) => {
           </p>
         </>
       ))}
-      <div className="mt-10 font-medium">{post.markdown.parent}</div>
-    </section>
-  )
-}
+      <div className="mt-10 font-medium">
+        <ReactMarkdown
+          components={{
+            code(props) {
+              const { children, className} = props
+              const match = /language-(\w+)/.exec(className || '')
+              return match ? (
+                <SyntaxHighlighter
+                  PreTag="div"
+                  language={match[1]}
+                  style={vscDarkPlus}
+                >
+                  {String(children).replace(/\n$/, '')}
+                </SyntaxHighlighter>
+              ) : (
+                <code className={className} {...props}>
+                  {children}
+                </code>
+              );
+            },
+          }}
+        >
+          {post.markdown.parent}
+        </ReactMarkdown>
+        <Link href="/">
+        <span className="pb-20 block mt-3 text-sky-900">←ホームに戻る</span>
+        </Link>
+      </div >
+    </section >
+  );
+};
 
 export default Post;
