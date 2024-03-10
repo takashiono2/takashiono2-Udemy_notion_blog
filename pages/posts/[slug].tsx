@@ -46,7 +46,7 @@ const Post = ({ post }) => {
         <ReactMarkdown
           components={{
             code(props) {
-              const { children, className} = props
+              const { children, className } = props
               const match = /language-(\w+)/.exec(className || '')
               return match ? (
                 <SyntaxHighlighter
@@ -67,7 +67,7 @@ const Post = ({ post }) => {
           {post.markdown.parent}
         </ReactMarkdown>
         <Link href="/">
-        <span className="pb-20 block mt-3 text-sky-900">←ホームに戻る</span>
+          <span className="pb-20 block mt-3 text-sky-900">←ホームに戻る</span>
         </Link>
       </div >
     </section >

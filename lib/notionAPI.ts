@@ -1,3 +1,4 @@
+import { NUMBER_OF_POSTS_PER_PAGE } from "@/constants/constants";
 import { Client } from "@notionhq/client";
 import { NotionToMarkdown } from "notion-to-md";
 
@@ -53,11 +54,22 @@ export const getSinglePost = async(slug) => {
   const page = response.results[0];
   const metadata = getPageMetaData(page);
   const mdBlocks = await n2m.pageToMarkdown(page.id);
-  console.log(mdBlocks);
   const mdString = n2m.toMarkdownString(mdBlocks);
-  // console.log(mdString);
   return {
     metadata,
     markdown: mdString,
   };
 };
+
+export const getPostsForTopPage = async(pageSize = 4)=>{
+  const allPosts = await getAllPosts();
+  const fourPosts = allPosts.slice(0,pageSize);
+  return fourPosts;
+}
+
+export const getPostByPage = async(page: number) =>{
+  const allPosts = await getAllPosts();
+  const startIndex = (page - 1) * NUMBER_OF_POSTS_PER_PAGE;
+  const endIndex = startIndex + NUMBER_OF_POSTS_PER_PAGE;
+  return allPosts.slice(startIndex,endIndex);
+}
