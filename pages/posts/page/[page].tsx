@@ -1,16 +1,20 @@
+import PageNation from "@/components/PageNation/PageNation";
 import { SinglePost } from "../../../components/Post/SinglePost";
-import { getPostByPage } from "../../../lib/notionAPI";
+import { getNumberOfPages, getPostByPage } from "../../../lib/notionAPI";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Head from "next/head";
 
 
 export const getStaticPaths: GetStaticPaths = async () => {
+
+  const numberOfPage = await getNumberOfPages();
+  let params = [];
+  for(let i = 1; i< numberOfPage ; i++){
+    params.push({ params: { page: i.toString() }})
+  }
+
   return {
-    paths: [
-      { params: { page: "1" } },
-      { params: { page: "2" } },
-      { params: { page: "3" } },
-    ],
+    paths: params,
     fallback: "blocking",
   }
 
@@ -54,6 +58,7 @@ const BlogPageList = ({ postsByPage }) => {
             </div>
           ))}
         </section>
+        <PageNation />
       </main>
     </div>
   );

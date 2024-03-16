@@ -6,7 +6,7 @@ const notion = new Client({
   auth: process.env.NOTION_TOKEN,
 });
 
-const n2m = new NotionToMarkdown({notionClient: notion});
+const n2m = new NotionToMarkdown({ notionClient: notion });
 
 export const getAllPosts = async () => {
   const posts = await notion.databases.query({
@@ -15,14 +15,14 @@ export const getAllPosts = async () => {
   });
   const allPosts = posts.results;
 
-  return allPosts.map((post)=>{
+  return allPosts.map((post) => {
     return getPageMetaData(post);
   });
 };
 
 const getPageMetaData = (post) => {
-  const getTags = (tags)=>{
-    const allTags = tags.map((tag)=>{
+  const getTags = (tags) => {
+    const allTags = tags.map((tag) => {
       return tag.name
     });
     return allTags;
@@ -38,13 +38,13 @@ const getPageMetaData = (post) => {
   };
 };
 
-export const getSinglePost = async(slug) => {
+export const getSinglePost = async (slug) => {
   const response = await notion.databases.query({
     database_id: process.env.NOTION_DATABASE_ID as string,
     filter: {
       property: "Slug",
       formula: {
-        string:{
+        string: {
           equals: slug,
         }
       },
@@ -61,15 +61,22 @@ export const getSinglePost = async(slug) => {
   };
 };
 
-export const getPostsForTopPage = async(pageSize = 4)=>{
+export const getPostsForTopPage = async (pageSize = 4) => {
   const allPosts = await getAllPosts();
-  const fourPosts = allPosts.slice(0,pageSize);
+  const fourPosts = allPosts.slice(0, pageSize);
   return fourPosts;
 }
 
-export const getPostByPage = async(page: number) =>{
+export const getPostByPage = async (page: number) => {
   const allPosts = await getAllPosts();
   const startIndex = (page - 1) * NUMBER_OF_POSTS_PER_PAGE;
   const endIndex = startIndex + NUMBER_OF_POSTS_PER_PAGE;
-  return allPosts.slice(startIndex,endIndex);
+  return allPosts.slice(startIndex, endIndex);
+}
+
+export const getNumberOfPages = async () => {
+  const allPosts = await getAllPosts();
+  return (
+    Math.floor(allPosts.length / NUMBER_OF_POSTS_PER_PAGE) + ((allPosts.length % NUMBER_OF_POSTS_PER_PAGE) > 0 ? 1 : 0)
+  );
 }
