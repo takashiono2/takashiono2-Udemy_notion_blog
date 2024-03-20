@@ -1,41 +1,34 @@
-import PageNation from "@/components/PageNation/PageNation";
-import { SinglePost } from "../../../components/Post/SinglePost";
-import { getNumberOfPages, getPostByPage } from "../../../lib/notionAPI";
+import PageNation from "../../../../../components/PageNation/PageNation";
+import { SinglePost } from "../../../../../components/Post/SinglePost";
+import { getNumberOfPages, getPostByPage, getPostsByTagAndPage } from "../../../../../lib/notionAPI";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Head from "next/head";
 
 
 export const getStaticPaths: GetStaticPaths = async () => {
-
-  const numberOfPage = await getNumberOfPages();
-  let params = [];
-  for(let i = 1; i< numberOfPage ; i++){
-    params.push({ params: { page: i.toString() }})
-  }
-
   return {
-    paths: params,
+    paths:
+    [
+      { params : {tag: "blog", page: "1" } },
+    ],
     fallback: "blocking",
-  }
-
+  };
 }
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  const currentPage = context.params?.page;
-  const postsByPage = await getPostByPage(
-    parseInt(currentPage!.toString(), 10)
-  );
-  const numberOfPage = await getNumberOfPages();
+  const currentPage: string = context.params?.page!.toString();
+  const currentTag: string = context.params?.tag!.toString();
+
+  const posts = await getPostsByTagAndPage(currentTag, parseInt(currentPage, 10));
   return {
     props: {
-      postsByPage,
-      numberOfPage
+      posts
     },
     revalidate: 60 * 60 * 6,
   }
 }
 
-const BlogPageList = ({ postsByPage, numberOfPage }) => {
+const BlogTagPageList = ({ numberOfPage, posts }) => {
 
   return (
     <div className="container h-full w-full mx-auto">
@@ -47,7 +40,7 @@ const BlogPageList = ({ postsByPage, numberOfPage }) => {
       <main className="container w-full mt-16">
         <h1 className="text-5xl font-medium text-center mb-16">Notion Blog🚀</h1>
         <section className="sm:grid grid-cols-2 w-5/6 gap-3 mx-auto">
-          {postsByPage.map((post) => (
+          {posts.map((post) => (
             <div key={post.id}>
               <SinglePost
                 title={post.title}
@@ -66,4 +59,4 @@ const BlogPageList = ({ postsByPage, numberOfPage }) => {
   );
 }
 
-export default BlogPageList;
+export default BlogTagPageList;

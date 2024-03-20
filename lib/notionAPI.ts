@@ -80,3 +80,14 @@ export const getNumberOfPages = async () => {
     Math.floor(allPosts.length / NUMBER_OF_POSTS_PER_PAGE) + ((allPosts.length % NUMBER_OF_POSTS_PER_PAGE) > 0 ? 1 : 0)
   );
 }
+
+export const getPostsByTagAndPage = async ( tagName: string,page: number) => {
+  const allPosts = await getAllPosts();
+  const posts = allPosts.filter((post)=>
+    post.tags.find((tag: string) => tag.toLowerCase() === tagName.toLowerCase())
+  );
+
+  const startIndex = (page - 1) * NUMBER_OF_POSTS_PER_PAGE;
+  const endIndex = startIndex + NUMBER_OF_POSTS_PER_PAGE;
+  return posts.slice(startIndex, endIndex);
+}

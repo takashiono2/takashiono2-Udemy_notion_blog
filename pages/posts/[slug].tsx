@@ -35,9 +35,9 @@ const Post = ({ post }) => {
         Posted date at {post.metadata.date}
       </span>
       <br />
-      {post.metadata.tags.map((tag: string) => (
+      {post.metadata.tags.map((tag: string, index: number) => (
         <>
-          <p className="text-white bg-sky-900 rounded-xl font-midum mt-2 px-2 inline-block mr-2">
+          <p className="text-white bg-sky-900 rounded-xl font-midum mt-2 px-2 inline-block mr-2" key={index}>
             {tag}
           </p>
         </>
