@@ -91,3 +91,21 @@ export const getPostsByTagAndPage = async ( tagName: string,page: number) => {
   const endIndex = startIndex + NUMBER_OF_POSTS_PER_PAGE;
   return posts.slice(startIndex, endIndex);
 }
+
+export const getNumberOfPagesByTag = async(tagName: string)=>{
+  const allPosts = await getAllPosts();
+  const posts = allPosts.filter((post)=>(
+    post.tags.find((tag: string) => tag.toLowerCase() === tagName.toLowerCase())
+  ));
+  return (
+    Math.floor(posts.length / NUMBER_OF_POSTS_PER_PAGE) + ((posts.length % NUMBER_OF_POSTS_PER_PAGE) > 0 ? 1 : 0)
+  );
+}
+
+export const getAllTags = async()=>{
+  const allPosts = await getAllPosts();
+  const allTagsDuplcationLists = allPosts.flatMap((post)=>post.tags);
+  const set = new Set(allTagsDuplcationLists);
+  const allTagList = Array.from(set);
+  return allTagList;
+}

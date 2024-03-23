@@ -1,11 +1,24 @@
 import PageNation from "../../../../../components/PageNation/PageNation";
 import { SinglePost } from "../../../../../components/Post/SinglePost";
-import { getNumberOfPages, getPostByPage, getPostsByTagAndPage } from "../../../../../lib/notionAPI";
+import { getAllTags, getNumberOfPages, getNumberOfPagesByTag, getPostByPage, getPostsByTagAndPage } from "../../../../../lib/notionAPI";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Head from "next/head";
 
 
 export const getStaticPaths: GetStaticPaths = async () => {
+  const allTags = await getAllTags();
+  let params = [];
+
+  await Promise.all(
+    allTags.map((tag: string)=>{
+      getNumberOfPagesByTag(tag).then((numberOfPagesByTag: number) =>{
+        for(let i = 1; i< numberOfPagesByTag ; i++){
+          params.push({ params: { tag: tag, page: i.toString() }});
+        }
+      });
+    })
+  );
+
   return {
     paths:
     [
@@ -16,8 +29,8 @@ export const getStaticPaths: GetStaticPaths = async () => {
 }
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  const currentPage: string = context.params?.page!.toString();
-  const currentTag: string = context.params?.tag!.toString();
+  const currentPage: string = context.params?.page?.toString() || '';
+  const currentTag: string = context.params?.page?.toString() || '';
 
   const posts = await getPostsByTagAndPage(currentTag, parseInt(currentPage, 10));
   return {
