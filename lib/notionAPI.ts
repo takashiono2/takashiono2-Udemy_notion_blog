@@ -81,7 +81,7 @@ export const getNumberOfPages = async () => {
   );
 }
 
-export const getPostsByTagAndPage = async ( tagName: string,page: number) => {
+export const getPostsByTagAndPage = async ( tagName: string, page: number) => {
   const allPosts = await getAllPosts();
   const posts = allPosts.filter((post)=>
     post.tags.find((tag: string) => tag.toLowerCase() === tagName.toLowerCase())

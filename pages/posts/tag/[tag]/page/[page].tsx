@@ -1,9 +1,8 @@
 import PageNation from "../../../../../components/PageNation/PageNation";
 import { SinglePost } from "../../../../../components/Post/SinglePost";
-import { getAllTags, getNumberOfPages, getNumberOfPagesByTag, getPostByPage, getPostsByTagAndPage } from "../../../../../lib/notionAPI";
+import { getAllTags,getNumberOfPagesByTag,getPostsByTagAndPage } from "../../../../../lib/notionAPI";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Head from "next/head";
-
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const allTags = await getAllTags();
@@ -11,8 +10,8 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
   await Promise.all(
     allTags.map((tag: string)=>{
-      getNumberOfPagesByTag(tag).then((numberOfPagesByTag: number) =>{
-        for(let i = 1; i< numberOfPagesByTag ; i++){
+      return getNumberOfPagesByTag(tag).then((numberOfPagesByTag: number) =>{
+        for(let i = 1; i <= numberOfPagesByTag ; i++){
           params.push({ params: { tag: tag, page: i.toString() }});
         }
       });
@@ -20,28 +19,30 @@ export const getStaticPaths: GetStaticPaths = async () => {
   );
 
   return {
-    paths:
-    [
-      { params : {tag: "blog", page: "1" } },
-    ],
+    paths: params,
     fallback: "blocking",
   };
 }
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const currentPage: string = context.params?.page?.toString() || '';
-  const currentTag: string = context.params?.page?.toString() || '';
+  const currentTag: string = context.params?.tag?.toString() || '';
 
   const posts = await getPostsByTagAndPage(currentTag, parseInt(currentPage, 10));
+
+  const numberOfPagesByTag = await getNumberOfPagesByTag(currentTag);
+
   return {
     props: {
-      posts
+      posts,
+      numberOfPagesByTag,
+      currentTag
     },
     revalidate: 60 * 60 * 6,
   }
 }
 
-const BlogTagPageList = ({ numberOfPage, posts }) => {
+const BlogTagPageList = ({ numberOfPagesByTag, posts, currentTag }) => {
 
   return (
     <div className="container h-full w-full mx-auto">
@@ -66,7 +67,10 @@ const BlogTagPageList = ({ numberOfPage, posts }) => {
             </div>
           ))}
         </section>
-        <PageNation numberOfPage = {numberOfPage}/>
+        <PageNation
+          numberOfPage = {numberOfPagesByTag}
+          tag = {currentTag}
+        />
       </main>
     </div>
   );
