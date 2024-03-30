@@ -1,3 +1,4 @@
+import Tag from "@/components/Tag/tag";
 import PageNation from "../../../../../components/PageNation/PageNation";
 import { SinglePost } from "../../../../../components/Post/SinglePost";
 import { getAllTags,getNumberOfPagesByTag,getPostsByTagAndPage } from "../../../../../lib/notionAPI";
@@ -31,18 +32,20 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const posts = await getPostsByTagAndPage(currentTag, parseInt(currentPage, 10));
 
   const numberOfPagesByTag = await getNumberOfPagesByTag(currentTag);
+  const allTags = await getAllTags();
 
   return {
     props: {
       posts,
       numberOfPagesByTag,
-      currentTag
+      currentTag,
+      allTags
     },
     revalidate: 60 * 60 * 6,
   }
 }
 
-const BlogTagPageList = ({ numberOfPagesByTag, posts, currentTag }) => {
+const BlogTagPageList = ({ numberOfPagesByTag, posts, currentTag, allTags }) => {
 
   return (
     <div className="container h-full w-full mx-auto">
@@ -71,6 +74,7 @@ const BlogTagPageList = ({ numberOfPagesByTag, posts, currentTag }) => {
           numberOfPage = {numberOfPagesByTag}
           tag = {currentTag}
         />
+        <Tag tags={allTags}/>
       </main>
     </div>
   );
